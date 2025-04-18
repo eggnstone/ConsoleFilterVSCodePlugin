@@ -1,104 +1,81 @@
-import * as vscode from 'vscode';
-import {Constants} from "./Constants";
-import {logDebug} from "./tools/LogTools";
+import * as vscode from "vscode";
+import { Constants } from "./Constants";
+import { logDebug } from "./tools/LogTools";
 
 // noinspection JSUnusedGlobalSymbols
-export async function activate(context: vscode.ExtensionContext): Promise<void>
-{
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
     if (Constants.DEBUG_STARTUP) logDebug("activate START");
 
-    let disposable = vscode.commands.registerCommand("CleanConsole.filterMessages", () => {
-        // Create and show a quick pick to select filter options
-        const items = [
-            {
-                label: "Show All Messages",
-                description: "Show all debug console messages"
-            },
-            {
-                label: "Hide Info Messages",
-                description: "Hide info level messages"
-            },
-            {
-                label: "Hide Warning Messages",
-                description: "Hide warning level messages"
-            },
-            {
-                label: "Hide Error Messages",
-                description: "Hide error level messages"
-            },
-            {
-                label: "Custom Filter",
-                description: "Set a custom filter pattern"
-            }
-        ];
-
-        vscode.window.showQuickPick(items).then(selection => {
-            if (!selection) {
-                return;
-            }
-
-            switch (selection.label) {
-                case "Show All Messages":
-                    // Reset any existing filters
-                    vscode.commands.executeCommand("workbench.debug.action.clearRepl");
-                    break;
-                case "Hide Info Messages":
-                    // Implement info message filtering
-                    filterMessages("info");
-                    break;
-                case "Hide Warning Messages":
-                    // Implement warning message filtering
-                    filterMessages("warning");
-                    break;
-                case "Hide Error Messages":
-                    // Implement error message filtering
-                    filterMessages("error");
-                    break;
-                case "Custom Filter":
-                    // Prompt for custom filter pattern
-                    vscode.window
-                        .showInputBox({
-                            placeHolder: "Enter filter pattern (regex)",
-                            prompt: "Messages matching this pattern will be hidden"
-                        })
-                        .then(pattern => {
-                            if (pattern) {
-                                filterMessages("custom", pattern);
-                            }
-                        });
-                    break;
-            }
-        });
-    });
-
-    context.subscriptions.push(disposable);
+    const disposable = filterMessages();
+    if (disposable) {
+        context.subscriptions.push(disposable);
+    }
 
     if (Constants.DEBUG_STARTUP) logDebug("activate END");
 }
 
 // noinspection JSUnusedGlobalSymbols
-export async function deactivate(): Promise<void>
-{
-}
+export async function deactivate(): Promise<void> {}
 
-function filterMessages(type: string, pattern?: string) {
-    logDebug(`filterMessages(${type}, ${pattern})`);
-    
+function filterMessages(): vscode.Disposable | undefined {
     // Get the debug console
     const debugConsole = vscode.debug.activeDebugConsole;
     if (!debugConsole) {
         vscode.window.showErrorMessage("No active debug session");
-        return;
+        return undefined;
     }
 
-    // Clear the console first
-    vscode.commands.executeCommand("workbench.debug.action.clearRepl");
+    // Subscribe to debug protocol messages
+    const disposable = vscode.debug.registerDebugAdapterTrackerFactory("*", {
+        createDebugAdapterTracker(session: vscode.DebugSession) {
+            return {
+                onDidSendMessage: (message: any) => {
+                    if (message.type === "event" && message.event === "output") {
+                        const colorCode = getColorCode(message.body.output);
+                        if (colorCode === undefined) {
+                            logDebug("Ignored: " + message.body.output);
+                            message.body.output = "";
+                        } else {
+                            message.body.output = colorCode + message.body.output + Constants.COLOR_RESET;
+                        }
+                    }
+                }
+            };
+        }
+    });
 
-    // Here you would implement the actual filtering logic
-    // This is a simplified example - in reality, you would need to:
-    // 1. Track the debug protocol messages
-    // 2. Filter them based on the selected criteria
-    // 3. Only show the filtered messages in the console
-
-    vscode.window.showInformationMessage(`Filtering ${type} messages${pattern ? ` with pattern: ${pattern}` : ""}`);
+    return disposable;
 }
+
+function matches(message: string, pattern: string): boolean {
+    const regex = new RegExp(pattern);
+    return regex.test(message);
+}
+
+const getColorCode = (output: any): string | undefined => {
+    if (
+        matches(output, "D/EGL_emulation") || //
+        matches(output, "E/libEGL") || //
+        matches(output, "I/Choreographer") //
+    ) {
+        return undefined;
+    }
+
+    if (matches(output, "Error:")) {
+        return Constants.COLOR_RED;
+    }
+
+    if (matches(output, "Warn:")) {
+        return Constants.COLOR_ORANGE;
+    }
+
+    if (matches(output, "Info:")) {
+        return Constants.COLOR_BLUE;
+    }
+
+    if (matches(output, "Debug:")) {
+        return Constants.COLOR_WHITE;
+    }
+
+    return Constants.COLOR_GRAY;
+};
