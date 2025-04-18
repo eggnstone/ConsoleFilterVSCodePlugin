@@ -1,8 +1,8 @@
 # Change Log
 
-## 1.0.2
+## 1.0.1
 
-- TODO
+- Made ignore patterns and color patterns configurable.
 
 ## 1.0.0
 

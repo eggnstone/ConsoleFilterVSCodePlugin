@@ -10,10 +10,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     if (Constants.DEBUG_STARTUP) logDebug("ConsoleFilter.activate START");
 
     const config = Config.parse(vscode.workspace.getConfiguration("consoleFilter"));
-
-    const disposable = filterMessages(config);
-    if (disposable) {
-        context.subscriptions.push(disposable);
+    if (config) {
+        const disposable = filterMessages(config);
+        if (disposable) {
+            context.subscriptions.push(disposable);
+        }
     }
 
     if (Constants.DEBUG_STARTUP) logDebug("ConsoleFilter.activate END");
@@ -22,7 +23,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 // noinspection JSUnusedGlobalSymbols
 export async function deactivate(): Promise<void> {}
 
-function filterMessages(config: Config | undefined): vscode.Disposable | undefined {
+function filterMessages(config: Config): vscode.Disposable | undefined {
     // Get the debug console
     const debugConsole = vscode.debug.activeDebugConsole;
     if (!debugConsole) {
@@ -36,7 +37,7 @@ function filterMessages(config: Config | undefined): vscode.Disposable | undefin
             return {
                 onDidSendMessage: (message: any) => {
                     if (message.type === "event" && message.event === "output") {
-                        const colorCode = getColorCode(message.body.output);
+                        const colorCode = getColorCode(message.body.output, config);
                         if (colorCode === undefined) {
                             logDebug("Ignored: " + message.body.output.trim());
                             message.body.output = "";
@@ -52,8 +53,43 @@ function filterMessages(config: Config | undefined): vscode.Disposable | undefin
     return disposable;
 }
 
-const getColorCode = (output: any): string | undefined => {
-    if (        
+const getColorCode = (output: any, config: Config): string | undefined => {
+    logDebug("config.ignorePatterns: " + config.ignorePatterns +  " " + config.ignorePatterns.length);
+    for (const ignorePattern of config.ignorePatterns) {
+        logDebug("  ignorePattern: " + ignorePattern);
+        if (RegExTools.matches(output, ignorePattern)) {
+            return undefined;
+        }
+    }
+
+    logDebug("config.patternsByColorMap: " + config.patternsByColorMap + " " + config.patternsByColorMap.size);
+    for (const [color, patterns] of config.patternsByColorMap.entries()) {
+        logDebug("  color: " + color + " patterns: " + patterns + " " + patterns.length); 
+        for (const pattern of patterns) {
+            logDebug("    pattern: " + pattern);
+            if (RegExTools.matches(output, pattern)) {
+                if (color === "red") {
+                    return AnsiColors.COLOR_RED;
+                } else if (color === "orange") {
+                    return AnsiColors.COLOR_ORANGE;
+                } else if (color === "blue") {
+                    return AnsiColors.COLOR_BLUE;
+                } else if (color === "white") {
+                    return AnsiColors.COLOR_WHITE;
+                } else if (color === "yellow") {
+                    return AnsiColors.COLOR_YELLOW;
+                } else if (color === "green") {
+                    return AnsiColors.COLOR_GREEN;
+                } else {
+                    return AnsiColors.COLOR_GRAY;
+                }
+            }
+        }
+    }
+
+    return AnsiColors.COLOR_GRAY;
+
+    /* if (
         RegExTools.matches(output, "Accessing hidden field") || //
         RegExTools.matches(output, "Accessing hidden method") || //
         RegExTools.matches(output, "Background concurrent mark compact GC freed") || //
@@ -103,5 +139,5 @@ const getColorCode = (output: any): string | undefined => {
         return AnsiColors.COLOR_WHITE;
     }
 
-    return AnsiColors.COLOR_GRAY;
+    return AnsiColors.COLOR_GRAY; */
 };

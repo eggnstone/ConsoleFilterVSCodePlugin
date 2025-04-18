@@ -3,8 +3,8 @@ import {logDebug} from "../tools/LogTools";
 
 export class Config
 {
-    private readonly ignorePatterns: string[] = [];
-    private readonly patternsByColorMap: Map<string, string[]> = new Map();
+    readonly ignorePatterns: string[] = [];
+    readonly patternsByColorMap: Map<string, string[]> = new Map();
 
     private constructor(configuration: WorkspaceConfiguration)
     {

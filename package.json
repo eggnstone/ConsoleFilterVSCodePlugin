@@ -8,7 +8,31 @@
     ],
     "contributes": {
         "configuration": {
-            "properties": {}
+            "properties": {
+                "consoleFilter.ignorePatterns": {
+                    "type": "array",
+                    "default": [
+                        "Accessing hidden field",
+                        "Accessing hidden method",
+                        "Background concurrent mark compact GC freed",
+                        "^./GoogleApiManager"                        
+                    ],
+                    "description": "List of patterns to ignore"
+                },
+                "consoleFilter.patternsByColorMap": {
+                    "type": "object",
+                    "default": {
+                        "red": ["Error:"],
+                        "orange": ["Warn:", "Warning:"],
+                        "blue": ["Info:"],
+                        "white": ["Debug:"],
+                        "yellow": ["Pattern that should make text yellow"],
+                        "green": ["Pattern that should make text green"],
+                        "0xff0000": ["Pattern that should make text red"]
+                    },
+                    "description": "Map of colors to patterns"
+                }
+            }
         },
         "commands": [
             {
@@ -52,5 +76,5 @@
         "lint": "eslint src --ext ts",
         "test": "jest --config jestconfig.json"
     },
-    "version": "1.0.2"
+    "version": "1.0.1"
 }
