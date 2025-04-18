@@ -1,1 +1,1 @@
-code --disable-extensions --extensionDevelopmentPath=C:\Dev\Plugins\VSCode\CleanConsoleVSCodePlugin
+code --disable-extensions --extensionDevelopmentPath=C:\Dev\Plugins\VSCode\ConsoleFilterVSCodePlugin

@@ -12,7 +12,7 @@ export function logError(s: string): void
 
 export class LogTools
 {
-    static debugOutputChannel = vscode.window.createOutputChannel("CleanConsole");
+    static debugOutputChannel = vscode.window.createOutputChannel("ConsoleFilter");
 
     static logDebug(s: string): void
     {
