@@ -1,17 +1,18 @@
 import * as vscode from "vscode";
 import { Constants } from "./Constants";
 import { logDebug } from "./tools/LogTools";
+import { RegExTools } from "./tools/RegExTools";
 
 // noinspection JSUnusedGlobalSymbols
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-    if (Constants.DEBUG_STARTUP) logDebug("activate START");
+    if (Constants.DEBUG_STARTUP) logDebug("ConsoleFilter.activate START");
 
     const disposable = filterMessages();
     if (disposable) {
         context.subscriptions.push(disposable);
     }
 
-    if (Constants.DEBUG_STARTUP) logDebug("activate END");
+    if (Constants.DEBUG_STARTUP) logDebug("ConsoleFilter.activate END");
 }
 
 // noinspection JSUnusedGlobalSymbols
@@ -33,7 +34,7 @@ function filterMessages(): vscode.Disposable | undefined {
                     if (message.type === "event" && message.event === "output") {
                         const colorCode = getColorCode(message.body.output);
                         if (colorCode === undefined) {
-                            logDebug("Ignored: " + message.body.output);
+                            logDebug("Ignored: " + message.body.output.trim());
                             message.body.output = "";
                         } else {
                             message.body.output = colorCode + message.body.output + Constants.COLOR_RESET;
@@ -47,33 +48,54 @@ function filterMessages(): vscode.Disposable | undefined {
     return disposable;
 }
 
-function matches(message: string, pattern: string): boolean {
-    const regex = new RegExp(pattern);
-    return regex.test(message);
-}
-
 const getColorCode = (output: any): string | undefined => {
-    if (
-        matches(output, "D/EGL_emulation") || //
-        matches(output, "E/libEGL") || //
-        matches(output, "I/Choreographer") //
+    if (        
+        RegExTools.matches(output, "Accessing hidden field") || //
+        RegExTools.matches(output, "Accessing hidden method") || //
+        RegExTools.matches(output, "Background concurrent mark compact GC freed") || //
+        RegExTools.matches(output, "^./ApplicationLoaders") || //
+        RegExTools.matches(output, "^./AssistStructure") || //
+        RegExTools.matches(output, "^./Choreographer") || //
+        RegExTools.matches(output, "^./CompatChangeReporter") || //
+        RegExTools.matches(output, "^./DynamiteModule") || //
+        RegExTools.matches(output, "^./EGL_emulation") || //
+        RegExTools.matches(output, "^./EventGDTLogger") || //
+        RegExTools.matches(output, "^./FirebaseAuth") || //
+        RegExTools.matches(output, "^./FlagRegistrar") || //
+        RegExTools.matches(output, "^./GoogleApiManager") || //
+        RegExTools.matches(output, "^./ImeTracker") || //
+        RegExTools.matches(output, "^./InputConnectionAdaptor") || //
+        RegExTools.matches(output, "^./InputMethodManager") || //
+        RegExTools.matches(output, "^./InsetsController") || //
+        RegExTools.matches(output, "^./InteractionJankMonitor") || //
+        RegExTools.matches(output, "^./JobService") || //
+        RegExTools.matches(output, "^./NativeCrypto") || //
+        RegExTools.matches(output, "^./SessionFirelogPublisher") || //
+        RegExTools.matches(output, "^./SessionLifecycleClient") || //
+        RegExTools.matches(output, "^./SessionLifecycleService") || //
+        RegExTools.matches(output, "^./TrafficStats") || //
+        RegExTools.matches(output, "^./TRuntime.CctTransportBackend") || //
+        RegExTools.matches(output, "^./WindowOnBackDispatcher") || //
+        RegExTools.matches(output, "^./exij") || //
+        RegExTools.matches(output, "^./libEGL") || //
+        RegExTools.matches(output, "^./nativeloader") //
     ) {
         return undefined;
     }
 
-    if (matches(output, "Error:")) {
+    if (RegExTools.matches(output, "Error:")) {
         return Constants.COLOR_RED;
     }
 
-    if (matches(output, "Warn:")) {
+    if (RegExTools.matches(output, "Warn:")) {
         return Constants.COLOR_ORANGE;
     }
 
-    if (matches(output, "Info:")) {
+    if (RegExTools.matches(output, "Info:")) {
         return Constants.COLOR_BLUE;
     }
 
-    if (matches(output, "Debug:")) {
+    if (RegExTools.matches(output, "Debug:")) {
         return Constants.COLOR_WHITE;
     }
 

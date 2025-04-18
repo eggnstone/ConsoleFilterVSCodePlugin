@@ -1,8 +1,8 @@
 export class Constants
 {
-    private static readonly DEBUG = true;
+    private static readonly DEBUG = false;
 
-    static readonly DEBUG_STARTUP = Constants.DEBUG && true;
+    static readonly DEBUG_STARTUP = Constants.DEBUG && false;
 
     // ANSI color code base
     private static readonly ANSI_PREFIX = "\x1b[";

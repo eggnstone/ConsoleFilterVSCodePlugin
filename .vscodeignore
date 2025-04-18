@@ -11,6 +11,10 @@ vsc-extension-quickstart.md
 **/.vscode-test.*
 
 ### Manually added ###
-/.idea/
+out/tests/**
+tests/**
+
 *.bat
+
+jestconfig.json
 TODO.md

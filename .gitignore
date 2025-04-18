@@ -1,4 +1,7 @@
-/out
 /dist
 /node_modules
-*.vsix
+/out
+
+/*.vsix
+/tests/*.js
+/tests/*.js.map
