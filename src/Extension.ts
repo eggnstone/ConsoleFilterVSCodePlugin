@@ -2,12 +2,16 @@ import * as vscode from "vscode";
 import { Constants } from "./Constants";
 import { logDebug } from "./tools/LogTools";
 import { RegExTools } from "./tools/RegExTools";
+import { Config } from "./data/Config";
+import { AnsiColors } from "./tools/AnsiColors";
 
 // noinspection JSUnusedGlobalSymbols
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     if (Constants.DEBUG_STARTUP) logDebug("ConsoleFilter.activate START");
 
-    const disposable = filterMessages();
+    const config = Config.parse(vscode.workspace.getConfiguration("consoleFilter"));
+
+    const disposable = filterMessages(config);
     if (disposable) {
         context.subscriptions.push(disposable);
     }
@@ -18,7 +22,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 // noinspection JSUnusedGlobalSymbols
 export async function deactivate(): Promise<void> {}
 
-function filterMessages(): vscode.Disposable | undefined {
+function filterMessages(config: Config | undefined): vscode.Disposable | undefined {
     // Get the debug console
     const debugConsole = vscode.debug.activeDebugConsole;
     if (!debugConsole) {
@@ -37,7 +41,7 @@ function filterMessages(): vscode.Disposable | undefined {
                             logDebug("Ignored: " + message.body.output.trim());
                             message.body.output = "";
                         } else {
-                            message.body.output = colorCode + message.body.output + Constants.COLOR_RESET;
+                            message.body.output = colorCode + message.body.output + AnsiColors.COLOR_RESET;
                         }
                     }
                 }
@@ -84,20 +88,20 @@ const getColorCode = (output: any): string | undefined => {
     }
 
     if (RegExTools.matches(output, "Error:")) {
-        return Constants.COLOR_RED;
+        return AnsiColors.COLOR_RED;
     }
 
     if (RegExTools.matches(output, "Warn:")) {
-        return Constants.COLOR_ORANGE;
+        return AnsiColors.COLOR_ORANGE;
     }
 
     if (RegExTools.matches(output, "Info:")) {
-        return Constants.COLOR_BLUE;
+        return AnsiColors.COLOR_BLUE;
     }
 
     if (RegExTools.matches(output, "Debug:")) {
-        return Constants.COLOR_WHITE;
+        return AnsiColors.COLOR_WHITE;
     }
 
-    return Constants.COLOR_GRAY;
+    return AnsiColors.COLOR_GRAY;
 };
