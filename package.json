@@ -1,0 +1,50 @@
+{
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "categories": [
+        "Debuggers",
+        "Formatters"
+    ],
+    "contributes": {
+        "configuration": {
+            "properties": {}
+        },
+        "commands": [
+            {
+                "command": "CleanConsole.filterMessages",
+                "title": "Filter Debug Console Messages"
+            }
+        ]
+    },
+    "description": "A filter for the Debug Console.",
+    "devDependencies": {
+        "@types/vscode": "^1.93.0",
+        "@types/mocha": "^10.0.8",
+        "@types/node": "22.x",
+        "@typescript-eslint/eslint-plugin": "^8.5.0",
+        "@typescript-eslint/parser": "^8.5.0",
+        "eslint": "^9.10.0",
+        "typescript": "^5.6.2",
+        "@vscode/test-cli": "^0.0.10",
+        "@vscode/test-electron": "^2.4.1"
+    },
+    "displayName": "CleanConsole",
+    "engines": {
+        "vscode": "^1.93.0"
+    },
+    "icon": "images/CleanConsole512.png",
+    "main": "./out/Extension.js",
+    "name": "CleanConsole",
+    "publisher": "eggnstone",
+    "repository": "https://github.com/eggnstone/CleanConsoleVSCodePlugin",
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "vscode-test"
+    },
+    "version": "0.1.0"
+}
