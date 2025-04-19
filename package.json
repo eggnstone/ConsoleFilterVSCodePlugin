@@ -28,7 +28,8 @@
                         "white": ["Debug:"],
                         "yellow": ["Pattern that should make text yellow"],
                         "green": ["Pattern that should make text green"],
-                        "0xff0000": ["Pattern that should make text red"]
+                        "0xff0000": ["Pattern that should make text red"],
+                        "#00ff00": ["Pattern that should make text green"]
                     },
                     "description": "Map of colors to patterns"
                 }

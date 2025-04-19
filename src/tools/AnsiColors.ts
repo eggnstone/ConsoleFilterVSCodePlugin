@@ -20,4 +20,39 @@ export class AnsiColors {
 
         return `${AnsiColors.ANSI_PREFIX}38;2;${r};${g};${b}m`;
     }
+
+    static getColorCode(colorText: string): string | undefined {
+        // Check if it's a hex color code (e.g. 0xffffff or #ffffff)
+        if (colorText.startsWith("0x") || colorText.startsWith("#")) {
+            try {
+                const hex = colorText.startsWith("0x") ? colorText.substring(2) : colorText.substring(1);
+                if (hex.length === 6) {
+                    const r = parseInt(hex.substring(0, 2), 16);
+                    const g = parseInt(hex.substring(2, 4), 16);
+                    const b = parseInt(hex.substring(4, 6), 16);
+                    if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+                        return AnsiColors.rgb(r, g, b);
+                    }
+                }
+            } catch {
+                return AnsiColors.COLOR_GRAY;
+            }
+        }
+
+        if (colorText === "red") {
+            return AnsiColors.COLOR_RED;
+        } else if (colorText === "orange") {
+            return AnsiColors.COLOR_ORANGE;
+        } else if (colorText === "blue") {
+            return AnsiColors.COLOR_BLUE;
+        } else if (colorText === "white") {
+            return AnsiColors.COLOR_WHITE;
+        } else if (colorText === "yellow") {
+            return AnsiColors.COLOR_YELLOW;
+        } else if (colorText === "green") {
+            return AnsiColors.COLOR_GREEN;
+        } else {
+            return AnsiColors.COLOR_GRAY;
+        }
+    }
 }

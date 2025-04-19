@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { RegExTools } from "../src/tools/RegExTools";
+import { RegExTools } from "./RegExTools";
 
 describe("RegEx Tests", () => {
     it("Positive test with simple text", () => {

@@ -1,6 +1,5 @@
-export class Constants
-{
+export class Constants {
     private static readonly DEBUG = false;
 
-    static readonly DEBUG_STARTUP = Constants.DEBUG && false;
+    static readonly DEBUG_EXTENSION = Constants.DEBUG && false;
 }
