@@ -16,5 +16,6 @@ tests/**
 
 *.bat
 
+images/ConsoleFilter512.png
 jestconfig.json
 TODO.md

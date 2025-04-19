@@ -65,7 +65,7 @@
     "engines": {
         "vscode": "^1.93.0"
     },
-    "icon": "images/ConsoleFilter512.png",
+    "icon": "images/ConsoleFilter512.jpg",
     "main": "./out/src/Extension.js",
     "name": "ConsoleFilter",
     "publisher": "eggnstone",
@@ -77,5 +77,5 @@
         "lint": "eslint src --ext ts",
         "test": "jest --config jestconfig.json"
     },
-    "version": "1.0.1"
+    "version": "1.0.2"
 }
