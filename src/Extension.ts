@@ -22,9 +22,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context.subscriptions.push(
         vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration("consoleFilter")) {
-                if (Constants.DEBUG_EXTENSION) logDebug("Configuration changed");
+                if (Constants.DEBUG_EXTENSION) logDebug("Workspace configuration changed");
                 config = Config.parse(vscode.workspace.getConfiguration("consoleFilter"));
-                if (Constants.DEBUG_EXTENSION) logDebug("  Updated config.");
+                logDebug("Using updated config.");
             }
         })
     );
